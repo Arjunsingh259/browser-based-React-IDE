@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CipherStudio - Browser-Based React IDE
+
+A browser-based React IDE built with Next.js and Sandpack, allowing users to create, edit, and preview React projects directly in the browser.
+
+## Features
+
+### Core Features
+- **File Management**: Create, edit, and organize project files
+- **Code Editor**: Rich code editing with Monaco Editor (via Sandpack)
+- **Live Preview**: Real-time preview of React components
+- **Save & Load Projects**: Persist projects using localStorage with project IDs
+- **Clean UI**: Intuitive interface for development
+
+### Optional Features
+- Theme switcher (dark/light)
+- Responsive design for desktop and tablet
+
+## Tech Stack
+
+- **Frontend**: Next.js 16, React 19, TypeScript
+- **Code Execution**: Sandpack (@codesandbox/sandpack-react)
+- **Styling**: Tailwind CSS
+- **Deployment**: Vercel (Frontend)
 
 ## Getting Started
 
-First, run the development server:
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
+4. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Project Structure
+
+```
+cipherstudio/
+├── src/
+│   └── app/
+│       ├── layout.tsx
+│       ├── page.tsx
+│       └── globals.css
+├── public/
+├── package.json
+└── README.md
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Usage
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **Create a New Project**: Click "New Project" to start fresh
+2. **Edit Code**: Use the built-in editor to modify files
+3. **Preview**: See changes live in the preview pane
+4. **Save**: Save your project with a unique ID
+5. **Load**: Load existing projects by ID
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Architecture
 
-## Learn More
+The application uses Sandpack for code execution and editing, providing a sandboxed environment for React development. Project state is managed locally using browser localStorage.
 
-To learn more about Next.js, take a look at the following resources:
+## Deployment
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Deploy the frontend to Vercel for easy access.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Contributing
 
-## Deploy on Vercel
+Feel free to contribute by opening issues or pull requests.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT License

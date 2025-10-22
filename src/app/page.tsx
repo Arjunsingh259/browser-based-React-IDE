@@ -1,65 +1,206 @@
-import Image from "next/image";
+"use client";
+
+import { useState, useEffect } from "react";
+import { SandpackProvider, SandpackLayout, SandpackCodeEditor, SandpackPreview, SandpackFileExplorer } from "@codesandbox/sandpack-react";
+
+const defaultFiles: Record<string, string> = {
+  "/App.js": `import React from 'react';
+import './styles.css';
+
+function App() {
+  return (
+    <div className="App">
+      <h1>Hello, CipherStudio!</h1>
+      <p>Welcome to your browser-based React IDE.</p>
+    </div>
+  );
+}
+
+export default App;`,
+  "/styles.css": `body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.App {
+  text-align: center;
+  padding: 20px;
+}`,
+  "/index.js": `import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);`,
+  "/public/index.html": `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Web site created using create-react-app"
+    />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <title>React App</title>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
+</html>`,
+};
 
 export default function Home() {
+  const [projectId, setProjectId] = useState<string>("default");
+  const [files, setFiles] = useState(defaultFiles);
+  const [projectName, setProjectName] = useState<string>("My React Project");
+  const [theme, setTheme] = useState<"light" | "dark">("dark");
+
+  useEffect(() => {
+    const savedProject = localStorage.getItem(`cipherstudio-${projectId}`);
+    if (savedProject) {
+      const parsed = JSON.parse(savedProject);
+      setFiles(parsed.files);
+      setProjectName(parsed.name);
+    }
+  }, [projectId]);
+
+  const saveProject = () => {
+    const projectData = { name: projectName, files };
+    localStorage.setItem(`cipherstudio-${projectId}`, JSON.stringify(projectData));
+    alert("Project saved!");
+  };
+
+  const loadProject = () => {
+    const id = prompt("Enter project ID to load:");
+    if (id) {
+      setProjectId(id);
+    }
+  };
+
+  const createNewProject = () => {
+    const name = prompt("Enter new project name:");
+    if (name) {
+      const newId = Date.now().toString();
+      setProjectId(newId);
+      setProjectName(name);
+      setFiles(defaultFiles);
+    }
+  };
+
+  const createFile = () => {
+    const fileName = prompt("Enter new file name (e.g., /newfile.js):");
+    if (fileName && !files[fileName]) {
+      setFiles(prev => ({ ...prev, [fileName]: "" }));
+    }
+  };
+
+  const renameFile = () => {
+    const oldName = prompt("Enter current file name to rename:");
+    if (oldName && files[oldName]) {
+      const newName = prompt("Enter new file name:");
+      if (newName && !files[newName]) {
+        setFiles(prev => {
+          const newFiles = { ...prev };
+          newFiles[newName] = newFiles[oldName];
+          delete newFiles[oldName];
+          return newFiles;
+        });
+      }
+    }
+  };
+
+  const deleteFile = () => {
+    const fileName = prompt("Enter file name to delete:");
+    if (fileName && files[fileName]) {
+      setFiles(prev => {
+        const newFiles = { ...prev };
+        delete newFiles[fileName];
+        return newFiles;
+      });
+    }
+  };
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === "dark" ? "light" : "dark");
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="h-screen flex flex-col">
+      <header className="bg-gray-800 text-white p-4 flex justify-between items-center">
+        <h1 className="text-xl font-bold">CipherStudio</h1>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={projectName}
+            onChange={(e) => setProjectName(e.target.value)}
+            className="px-2 py-1 text-black"
+            placeholder="Project Name"
+          />
+          <button onClick={saveProject} className="bg-blue-500 px-4 py-1 rounded">
+            Save
+          </button>
+          <button onClick={loadProject} className="bg-green-500 px-4 py-1 rounded">
+            Load
+          </button>
+          <button onClick={createNewProject} className="bg-purple-500 px-4 py-1 rounded">
+            New Project
+          </button>
+          <button onClick={createFile} className="bg-yellow-500 px-4 py-1 rounded">
+            Create File
+          </button>
+          <button onClick={renameFile} className="bg-orange-500 px-4 py-1 rounded">
+            Rename File
+          </button>
+          <button onClick={deleteFile} className="bg-red-500 px-4 py-1 rounded">
+            Delete File
+          </button>
+          <button onClick={toggleTheme} className="bg-indigo-500 px-4 py-1 rounded">
+            {theme === "dark" ? "Light Mode" : "Dark Mode"}
+          </button>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+      </header>
+      <div className="flex-1">
+        <SandpackProvider
+          template="react"
+          files={files}
+          theme={theme}
+          options={{
+            externalResources: ["https://cdn.tailwindcss.com"],
+          }}
+        >
+          <SandpackLayout>
+            <SandpackFileExplorer />
+            <SandpackCodeEditor
+              showTabs
+              closableTabs
+              showLineNumbers
+              showInlineErrors
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+            <SandpackPreview
+              showRefreshButton
+              showOpenInCodeSandbox={false}
+            />
+          </SandpackLayout>
+        </SandpackProvider>
+      </div>
     </div>
   );
 }
